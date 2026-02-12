@@ -123,6 +123,22 @@ if hasattr(model, "predict_proba"):
     ax2.set_title(f"ROC Curve (AUC = {roc_auc:.2f})")
     st.pyplot(fig2)
 
+
+from sklearn.metrics import precision_recall_curve, average_precision_score
+
+st.subheader("Precision-Recall Curve")
+
+y_prob = model.predict_proba(X_test)[:, 1]
+precision, recall, _ = precision_recall_curve(y_test, y_prob)
+ap_score = average_precision_score(y_test, y_prob)
+
+fig_pr, ax_pr = plt.subplots()
+ax_pr.plot(recall, precision)
+ax_pr.set_xlabel("Recall")
+ax_pr.set_ylabel("Precision")
+ax_pr.set_title(f"Precision-Recall Curve (AP = {ap_score:.2f})")
+
+st.pyplot(fig_pr)
 # ================= FEATURE IMPORTANCE =================
 if model_option == "Decision Tree":
     st.subheader("Feature Importance")
