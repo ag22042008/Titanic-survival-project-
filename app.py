@@ -20,7 +20,7 @@ st.set_page_config(page_title="Titanic ML Dashboard", layout="wide")
 st.title("🚢 Titanic Survival Prediction – ML Dashboard")
 st.markdown("End-to-End Machine Learning Model Comparison & Deployment Interface")
 
-# ================= DATA =================
+# ================= LOAD DATA =================
 
 @st.cache_data
 def load_data():
@@ -137,26 +137,42 @@ if model_option == "Decision Tree":
 st.subheader("Manual Passenger Survival Prediction")
 
 pclass = st.selectbox("Passenger Class", [1,2,3])
-sex = st.selectbox("Sex", ["Male","Female"])
+sex_input = st.selectbox("Sex", ["Male","Female"])
 age = st.slider("Age", 1, 80, 25)
 sibsp = st.slider("Siblings/Spouse", 0, 5, 0)
 parch = st.slider("Parents/Children", 0, 5, 0)
 fare = st.slider("Fare", 0, 500, 50)
 embarked = st.selectbox("Embarked", ["C","Q","S"])
 
-sex = 1 if sex == "Male" else 0
+sex = 1 if sex_input == "Male" else 0
 emb_C = 1 if embarked == "C" else 0
 emb_Q = 1 if embarked == "Q" else 0
 emb_S = 1 if embarked == "S" else 0
 
-input_data = np.array([[pclass, sex, age, sibsp, parch, fare, emb_C, emb_Q, emb_S]])
-
 if st.button("Predict Survival"):
-    prediction = model.predict(input_data)[0]
-    if prediction == 1:
-        st.success("Passenger is likely to SURVIVE")
-    else:
-        st.error("Passenger is likely to NOT SURVIVE")
+
+    input_df = pd.DataFrame({
+        "pclass": [pclass],
+        "sex": [sex],
+        "age": [age],
+        "sibsp": [sibsp],
+        "parch": [parch],
+        "fare": [fare],
+        "embarked_C": [emb_C],
+        "embarked_Q": [emb_Q],
+        "embarked_S": [emb_S],
+    })
+
+    try:
+        prediction = model.predict(input_df)[0]
+
+        if prediction == 1:
+            st.success("Passenger is likely to SURVIVE")
+        else:
+            st.error("Passenger is likely to NOT SURVIVE")
+
+    except Exception as e:
+        st.error("Prediction failed. Please check input structure.")
 
 # ================= REPORT =================
 
